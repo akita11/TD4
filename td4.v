@@ -6,6 +6,21 @@
 // INOUT/I 4 IN[3:0]
 // INOUT/O 8 RA[3:0] RB[3:0]
 //           CF??
+
+// Instructions:
+// MOV A, Im  0011mmmm
+// MOV B, Im  0111mmmm
+// MOV A, B   00010000
+// MOV B, A   01000000
+// ADD A, Im  0000mmmm
+// ADD B, Im  0101mmmm
+// IN A       00100000
+// IN B       01100000
+// OUT Im     1011mmmm
+// OUT B      10010000
+// JMP Im     1111mmmm
+// JNC Im     1110mmmm  
+
 module td4(clk, rst, addr, data, cf, port_i, port_o);
    input clk, rst;
    input [7:0] data;
@@ -41,7 +56,7 @@ module td4(clk, rst, addr, data, cf, port_i, port_o);
    assign {co, adder_s} = adder_a + im;
 
    // 74153 x2
-   always @(sel, reg_a, reg_b) begin
+   always @(sel, reg_a, reg_b, port_i) begin
       case (sel)
 	2'b00 : adder_a <= reg_a;
 	2'b01 : adder_a <= reg_b;
