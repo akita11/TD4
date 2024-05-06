@@ -6,7 +6,7 @@
 // INOUT/I 4 IN[3:0]
 // INOUT/O 8 RA[3:0] RB[3:0]
 //           CF??
-module td4(clk, rst, addr, data, cf);
+module td4(clk, rst, addr, data, cf, port_i, port_o);
    input clk, rst;
    input [7:0] data;
    output [3:0] addr;
@@ -28,25 +28,25 @@ module td4(clk, rst, addr, data, cf);
    assign op = data[7:4], im = data[3:0];
 
    // selector
-   assign sl[0] = op[0] | op[3];
-   assign sl[1] = op[1];
+   assign sel[0] = op[0] | op[3];
+   assign sel[1] = op[1];
 
    // instruction decoder
    assign ld_n[0] = op[2] | op[3];
    assign ld_n[1] = ~op[2] | op[3];
    assign ld_n[2] = ~(~op[2] & op[3]);
-   assign ld_n[3] = ~(~op[3] & op[2] & (cf_n | op[0]));
+   assign ld_n[3] = ~(op[3] & op[2] & (cf_n | op[0]));
 
    // 74283
-   {co, adder_s} = adder_a + im;
+   assign {co, adder_s} = adder_a + im;
 
    // 74153 x2
    always @(sel, reg_a, reg_b) begin
       case (sel)
-	2'b00 : addr_a <= reg_a;
-	2'b01 : addr_a <= reg_b;
-	2'b10 : addr_a <= port_i;
-	2'b11 : addr_a <= 4'b0000;
+	2'b00 : adder_a <= reg_a;
+	2'b01 : adder_a <= reg_b;
+	2'b10 : adder_a <= port_i;
+	2'b11 : adder_a <= 4'b0000;
       endcase
    end
 
